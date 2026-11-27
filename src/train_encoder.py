@@ -163,6 +163,7 @@ def run_encoder(
         "total_params": total,
         "loss_start": sum(first) / len(first),
         "loss_end": sum(last) / len(last),
+        "predictions": predictions,
     }
     del model
     return result

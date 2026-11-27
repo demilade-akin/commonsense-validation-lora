@@ -2,13 +2,17 @@
 
 Usage, from the repository root:
     python run_all.py --quick            # tiny run: checks every stage and estimates full run time
-    python run_all.py                    # full run on the test split
+    python run_all.py                    # full run on the test split (reported results)
+    python run_all.py --full-data        # all training data and test questions (exceeds 1 hour on the VM)
+    python run_all.py --tag mac          # same settings, saved as results_mac.json
     python run_all.py --split dev        # full run on the dev split (for tuning)
     python run_all.py --methods random,zero-shot --subtasks A
     python run_all.py --methods random,zero-shot,few-shot,lora,roberta-base,distilbert
 
-Results print as a table and are saved to results/results.json
-(results/results_quick.json for --quick).
+Results print as a table and are saved to results/results.json, with each
+method's prediction for every question in results/predictions.json.
+--quick, --full-data and --tag add a suffix to both names, for example
+results/results_full.json.
 """
 
 from __future__ import annotations
@@ -50,7 +54,14 @@ DEFAULT_METHODS = [m for m in METHODS if m != "distilbert"]
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run every method on ComVE Subtasks A and B.")
-    parser.add_argument("--quick", action="store_true", help="tiny sizes: check every stage and time it")
+    sizes = parser.add_mutually_exclusive_group()
+    sizes.add_argument("--quick", action="store_true", help="tiny sizes: check every stage and time it")
+    sizes.add_argument(
+        "--full-data",
+        action="store_true",
+        help="use all training examples and test questions (does not fit the 1-hour VM limit)",
+    )
+    parser.add_argument("--tag", default="", help="suffix for the output files, e.g. mac")
     parser.add_argument("--split", default=EVAL_SPLIT, choices=["dev", "test"])
     parser.add_argument("--methods", default=",".join(DEFAULT_METHODS), help=f"comma-separated, from {METHODS}")
     parser.add_argument("--subtasks", default="AB", help="A, B or AB")
@@ -75,6 +86,7 @@ def run_method(method: str, subtask: str, eval_examples, args, lora_cfg, encoder
             "n_eval": len(eval_examples),
             "prediction_counts": counts,
             "eval_seconds": t.seconds,
+            "predictions": predictions,
         }
 
     if method in ("zero-shot", "few-shot"):
@@ -128,10 +140,24 @@ def main() -> None:
     args = parse_args()
     hf_logging.set_verbosity_error()  # hide expected warnings, e.g. the new multiple-choice head
 
-    eval_n = QUICK_EVAL_N if args.quick else EVAL_N
-    lora_cfg = replace(LORA, train_n=QUICK_TRAIN_N) if args.quick else LORA
-    encoder_cfg = replace(ENCODER, train_n=QUICK_TRAIN_N) if args.quick else ENCODER
-    out_path = RESULTS_DIR / ("results_quick.json" if args.quick else "results.json")
+    if args.quick:
+        eval_n = QUICK_EVAL_N
+        lora_cfg = replace(LORA, train_n=QUICK_TRAIN_N)
+        encoder_cfg = replace(ENCODER, train_n=QUICK_TRAIN_N)
+    elif args.full_data:
+        eval_n = None
+        lora_cfg = replace(LORA, train_n=None)
+        encoder_cfg = replace(ENCODER, train_n=None)
+    else:
+        eval_n, lora_cfg, encoder_cfg = EVAL_N, LORA, ENCODER
+
+    suffix = "".join(
+        f"_{part}" for part in ("quick" if args.quick else "", "full" if args.full_data else "", args.tag) if part
+    )
+    out_path = RESULTS_DIR / f"results{suffix}.json"
+    predictions_path = RESULTS_DIR / f"predictions{suffix}.json"
+    # predictions[subtask][method] = list of {"id", "label", "prediction"}
+    predictions: dict[str, dict[str, list[dict]]] = {}
 
     # The base language model is loaded once and shared by zero-shot and
     # few-shot prompting. LoRA loads its own fresh copy for each subtask.
@@ -145,6 +171,7 @@ def main() -> None:
     rows: list[dict] = []
     settings = {
         "quick": args.quick,
+        "full_data": args.full_data,
         "split": args.split,
         "eval_n": eval_n,
         "seed": SEED,
@@ -167,6 +194,11 @@ def main() -> None:
                 row = {"subtask": subtask, "method": method, "split": args.split}
                 try:
                     row.update(run_method(method, subtask, eval_examples, args, lora_cfg, encoder_cfg, lm))
+                    predicted = row.pop("predictions")
+                    predictions.setdefault(subtask, {})[method] = [
+                        {"id": ex.id, "label": ex.label, "prediction": p}
+                        for ex, p in zip(eval_examples, predicted)
+                    ]
                     print(f"accuracy {row['accuracy']:.3f} | picks {row['prediction_counts']}")
                 except Exception as exc:  # keep going so one failure does not lose every result
                     traceback.print_exc()
@@ -174,11 +206,12 @@ def main() -> None:
                 rows.append(row)
                 # Save after every stage so a crash or time-out keeps earlier results.
                 save_json({"settings": settings, "results": rows}, out_path)
+                save_json(predictions, predictions_path)
 
     print_table(rows)
     print(f"\nTotal time: {total.seconds / 60:.1f} min")
     save_json({"settings": settings, "results": rows, "total_seconds": total.seconds}, out_path)
-    print(f"Saved {out_path.relative_to(out_path.parents[1])}")
+    print(f"Saved {out_path.relative_to(out_path.parents[1])} and {predictions_path.name}")
     if args.quick:
         estimate_full_run(rows, args.split)
 

@@ -41,6 +41,7 @@ def evaluate_lm(
         "prediction_counts": result.prediction_counts(),
         "mean_letter_mass": result.mean_letter_mass,
         "eval_seconds": t.seconds,
+        "predictions": result.predictions,
     }
 
 

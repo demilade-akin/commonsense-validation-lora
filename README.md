@@ -72,6 +72,7 @@ Run every command from the repository root.
 python run_all.py --quick     # tiny run: checks every stage and estimates the full run time
 python run_all.py             # full run, reported results on the test split (about 35 min on the course VM)
 python run_all.py --split dev # full run on the dev split
+python run_all.py --full-data # all 10,000 training examples and 1,000 test questions per subtask (over 1 hour on the VM)
 ```
 
 Run a subset with `--methods` and `--subtasks`, for example:
@@ -80,7 +81,7 @@ Run a subset with `--methods` and `--subtasks`, for example:
 python run_all.py --methods random,zero-shot,lora --subtasks A
 ```
 
-The script prints a results table and saves every number, setting and timing to `results/results.json` (`results/results_quick.json` for `--quick`). It saves after every stage, so a crash keeps the results finished so far.
+The script prints a results table and saves every number, setting and timing to `results/results.json`, and every method's answer to each question to `results/predictions.json`. `--quick`, `--full-data` and `--tag NAME` add a suffix to both file names (for example `results_full.json`), so no run overwrites another. The script saves after every stage, so a crash keeps the results finished so far.
 
 ### Fitting the one-hour limit
 
