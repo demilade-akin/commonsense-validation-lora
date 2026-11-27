@@ -1,0 +1,205 @@
+{
+  "settings": {
+    "quick": false,
+    "split": "test",
+    "eval_n": 200,
+    "seed": 42,
+    "model": "Qwen/Qwen3-0.6B",
+    "encoders": {
+      "roberta-base": "FacebookAI/roberta-base",
+      "distilbert": "distilbert/distilbert-base-uncased"
+    },
+    "few_shot_k": {
+      "A": 2,
+      "B": 3
+    },
+    "lora": {
+      "rank": 8,
+      "alpha": 16,
+      "dropout": 0.05,
+      "target_modules": [
+        "q_proj",
+        "v_proj"
+      ],
+      "train_n": 250,
+      "epochs": 1,
+      "batch_size": 8,
+      "lr": 0.0003,
+      "warmup_ratio": 0.1,
+      "max_grad_norm": 1.0
+    },
+    "encoder": {
+      "train_n": 500,
+      "epochs": 1,
+      "batch_size": 16,
+      "lr": 3e-05,
+      "warmup_ratio": 0.1,
+      "max_length": 128,
+      "max_grad_norm": 1.0
+    }
+  },
+  "results": [
+    {
+      "subtask": "A",
+      "method": "random",
+      "split": "test",
+      "accuracy": 0.525,
+      "n_eval": 200,
+      "prediction_counts": {
+        "A": 113,
+        "B": 87
+      },
+      "eval_seconds": 5.9189999774389435e-05
+    },
+    {
+      "subtask": "B",
+      "method": "random",
+      "split": "test",
+      "accuracy": 0.29,
+      "n_eval": 200,
+      "prediction_counts": {
+        "A": 70,
+        "B": 59,
+        "C": 71
+      },
+      "eval_seconds": 3.693200005727704e-05
+    },
+    {
+      "subtask": "A",
+      "method": "zero-shot",
+      "split": "test",
+      "accuracy": 0.48,
+      "n_eval": 200,
+      "prediction_counts": {
+        "A": 30,
+        "B": 170
+      },
+      "mean_letter_mass": 0.19581835235469044,
+      "eval_seconds": 23.472991013999945,
+      "shots": 0
+    },
+    {
+      "subtask": "B",
+      "method": "zero-shot",
+      "split": "test",
+      "accuracy": 0.385,
+      "n_eval": 200,
+      "prediction_counts": {
+        "A": 172,
+        "B": 25,
+        "C": 3
+      },
+      "mean_letter_mass": 0.004568107343802694,
+      "eval_seconds": 34.28085659299995,
+      "shots": 0
+    },
+    {
+      "subtask": "A",
+      "method": "few-shot",
+      "split": "test",
+      "accuracy": 0.47,
+      "n_eval": 200,
+      "prediction_counts": {
+        "A": 198,
+        "B": 2
+      },
+      "mean_letter_mass": 0.999906844496727,
+      "eval_seconds": 61.77619826399996,
+      "shots": 2
+    },
+    {
+      "subtask": "B",
+      "method": "few-shot",
+      "split": "test",
+      "accuracy": 0.515,
+      "n_eval": 200,
+      "prediction_counts": {
+        "A": 88,
+        "B": 12,
+        "C": 100
+      },
+      "mean_letter_mass": 0.9961454093456268,
+      "eval_seconds": 145.92385781699977,
+      "shots": 3
+    },
+    {
+      "subtask": "A",
+      "method": "lora",
+      "split": "test",
+      "accuracy": 0.84,
+      "n_eval": 200,
+      "prediction_counts": {
+        "A": 116,
+        "B": 84
+      },
+      "mean_letter_mass": 0.058013913566246626,
+      "eval_seconds": 26.88811123000005,
+      "n_train": 250,
+      "train_seconds": 87.5509418190004,
+      "trainable_params": 1146880,
+      "total_params": 597196800,
+      "lora_layers": 56,
+      "loss_start": 0.8486547470092773,
+      "loss_end": 0.4782380859057109
+    },
+    {
+      "subtask": "B",
+      "method": "lora",
+      "split": "test",
+      "accuracy": 0.725,
+      "n_eval": 200,
+      "prediction_counts": {
+        "A": 57,
+        "B": 88,
+        "C": 55
+      },
+      "mean_letter_mass": 0.9999803718924523,
+      "eval_seconds": 37.895657668999775,
+      "n_train": 250,
+      "train_seconds": 562.6957913670003,
+      "trainable_params": 1146880,
+      "total_params": 597196800,
+      "lora_layers": 56,
+      "loss_start": 1.4798797369003296,
+      "loss_end": 0.2780948802828789
+    },
+    {
+      "subtask": "A",
+      "method": "roberta-base",
+      "split": "test",
+      "accuracy": 0.87,
+      "n_eval": 200,
+      "prediction_counts": {
+        "A": 104,
+        "B": 96
+      },
+      "eval_seconds": 2.7465881830003127,
+      "n_train": 500,
+      "train_seconds": 33.84418767599982,
+      "trainable_params": 124646401,
+      "total_params": 124646401,
+      "loss_start": 0.6973291039466858,
+      "loss_end": 0.672432025273641
+    },
+    {
+      "subtask": "B",
+      "method": "roberta-base",
+      "split": "test",
+      "accuracy": 0.575,
+      "n_eval": 200,
+      "prediction_counts": {
+        "A": 73,
+        "B": 74,
+        "C": 53
+      },
+      "eval_seconds": 8.146346100999835,
+      "n_train": 500,
+      "train_seconds": 78.55860711200012,
+      "trainable_params": 124646401,
+      "total_params": 124646401,
+      "loss_start": 1.0941744248072307,
+      "loss_end": 1.0967228412628174
+    }
+  ],
+  "total_seconds": 1129.2609073419999
+}
