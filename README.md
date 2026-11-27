@@ -17,10 +17,10 @@ Both subtasks are multiple choice and use accuracy, the official metric of the s
 |---|---|---|
 | Random | Baseline | Picks an answer uniformly at random (fixed seed) |
 | Zero-shot | Prompting | Qwen3-0.6B answers the question with no examples and no training |
-| Few-shot | Prompting | Qwen3-0.6B sees solved training examples first (4 for A, 3 for B, letters balanced) |
+| Few-shot | Prompting | Qwen3-0.6B sees solved training examples first (2 for A, 3 for B, letters balanced) |
 | **LoRA** | **Proposed approach** | Qwen3-0.6B with low-rank adapters on `q_proj` and `v_proj`, trained on the task |
 | RoBERTa-base | Benchmark | Full fine-tuning with a multiple-choice head |
-| DistilBERT | Benchmark | Full fine-tuning with a multiple-choice head |
+| DistilBERT | Optional benchmark | Full fine-tuning with a multiple-choice head (not in the default run) |
 
 **Letter scoring.** The language model never generates text. Each question lists its options with letters, and the model runs one forward pass. We compare its scores for the answer letters at the first position of its reply and pick the highest. This always gives a valid answer, needs no parsing and reads the model's answer the same way during training and evaluation.
 
@@ -70,7 +70,7 @@ Run every command from the repository root.
 
 ```
 python run_all.py --quick     # tiny run: checks every stage and estimates the full run time
-python run_all.py             # full run, reported results on the test split
+python run_all.py             # full run, reported results on the test split (about 35 min on the course VM)
 python run_all.py --split dev # full run on the dev split
 ```
 
@@ -84,7 +84,9 @@ The script prints a results table and saves every number, setting and timing to 
 
 ### Fitting the one-hour limit
 
-The full run must finish within one hour on the course VM. `python run_all.py --quick` measures the speed of every stage and prints an estimate of the full run. If the estimate is too long, lower `train_n` in `LoRASettings` and `EncoderSettings` in `src/config.py`, the number of training examples per subtask.
+The full run must finish within one hour on the course VM (4 CPU cores, 5.8 GB RAM). With the settings in `src/config.py`, the default run took 35 minutes there: 400 test questions per subtask, 400 LoRA training examples and 2,000 RoBERTa training examples per subtask. Close other programs, such as the browser, before running: when memory runs short the VM swaps to disk and training slows down several times.
+
+`python run_all.py --quick` measures the speed of every stage on the current machine and prints an estimate of the full run. If the estimate is too long, lower `train_n` in `LoRASettings` and `EncoderSettings` or `EVAL_N` in `src/config.py`.
 
 ## Reproducibility
 

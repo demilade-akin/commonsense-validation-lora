@@ -46,16 +46,17 @@ EXPECTED_COUNTS = {"train": 10_000, "dev": 997, "test": 1_000}
 # Split used for the reported results. Use "dev" while tuning settings.
 EVAL_SPLIT = "test"
 
-# Examples scored per subtask. None scores the whole split.
-EVAL_N: int | None = None
+# Examples scored per subtask, sampled with SEED. None scores the whole split.
+# 400 keeps the full run under one hour on the course VM.
+EVAL_N: int | None = 400
 
 # ---------------------------------------------------------------------------
 # Prompting
 # ---------------------------------------------------------------------------
 # Solved training examples shown in few-shot prompts. The counts give each
-# answer letter the same number of examples (A/B twice for Subtask A, A/B/C
+# answer letter the same number of examples (A/B once for Subtask A, A/B/C
 # once for Subtask B), which avoids teaching the model to favour one letter.
-FEW_SHOT_K = {"A": 4, "B": 3}
+FEW_SHOT_K = {"A": 2, "B": 3}
 
 # Prompts scored per forward pass.
 SCORING_BATCH_SIZE = 8
@@ -70,10 +71,10 @@ class LoRASettings:
     alpha: int = 16                        # scale of the update (alpha / rank)
     dropout: float = 0.05                  # dropout on the LoRA input
     target_modules: tuple[str, ...] = ("q_proj", "v_proj")
-    train_n: int | None = 1000             # training examples per subtask
+    train_n: int | None = 400              # training examples per subtask
     epochs: int = 1
     batch_size: int = 8
-    lr: float = 2e-4
+    lr: float = 3e-4
     warmup_ratio: float = 0.1
     max_grad_norm: float = 1.0
 
@@ -83,10 +84,10 @@ class LoRASettings:
 # ---------------------------------------------------------------------------
 @dataclass(frozen=True)
 class EncoderSettings:
-    train_n: int | None = 3000             # training examples per subtask
+    train_n: int | None = 2000             # training examples per subtask
     epochs: int = 1
     batch_size: int = 16
-    lr: float = 2e-5
+    lr: float = 3e-5
     warmup_ratio: float = 0.1
     max_length: int = 128                  # tokens per choice
     max_grad_norm: float = 1.0

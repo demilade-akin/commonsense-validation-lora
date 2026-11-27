@@ -5,6 +5,7 @@ Usage, from the repository root:
     python run_all.py                    # full run on the test split
     python run_all.py --split dev        # full run on the dev split (for tuning)
     python run_all.py --methods random,zero-shot --subtasks A
+    python run_all.py --methods random,zero-shot,few-shot,lora,roberta-base,distilbert
 
 Results print as a table and are saved to results/results.json
 (results/results_quick.json for --quick).
@@ -42,13 +43,16 @@ from src.train_lora import run_lora
 from src.utils import Timer, accuracy, save_json, set_seed
 
 METHODS = ["random", "zero-shot", "few-shot", "lora", *ENCODER_MODELS]
+# DistilBERT is optional: leaving it out keeps the default run well under one hour
+# on the course VM. Add it with --methods.
+DEFAULT_METHODS = [m for m in METHODS if m != "distilbert"]
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run every method on ComVE Subtasks A and B.")
     parser.add_argument("--quick", action="store_true", help="tiny sizes: check every stage and time it")
     parser.add_argument("--split", default=EVAL_SPLIT, choices=["dev", "test"])
-    parser.add_argument("--methods", default=",".join(METHODS), help=f"comma-separated, from {METHODS}")
+    parser.add_argument("--methods", default=",".join(DEFAULT_METHODS), help=f"comma-separated, from {METHODS}")
     parser.add_argument("--subtasks", default="AB", help="A, B or AB")
     args = parser.parse_args()
     args.methods = [m.strip() for m in args.methods.split(",") if m.strip()]

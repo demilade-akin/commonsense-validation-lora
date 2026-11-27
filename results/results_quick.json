@@ -1,0 +1,242 @@
+{
+  "settings": {
+    "quick": true,
+    "split": "dev",
+    "eval_n": 20,
+    "seed": 42,
+    "model": "Qwen/Qwen3-0.6B",
+    "encoders": {
+      "roberta-base": "FacebookAI/roberta-base",
+      "distilbert": "distilbert/distilbert-base-uncased"
+    },
+    "few_shot_k": {
+      "A": 4,
+      "B": 3
+    },
+    "lora": {
+      "rank": 8,
+      "alpha": 16,
+      "dropout": 0.05,
+      "target_modules": [
+        "q_proj",
+        "v_proj"
+      ],
+      "train_n": 32,
+      "epochs": 1,
+      "batch_size": 8,
+      "lr": 0.0002,
+      "warmup_ratio": 0.1,
+      "max_grad_norm": 1.0
+    },
+    "encoder": {
+      "train_n": 32,
+      "epochs": 1,
+      "batch_size": 16,
+      "lr": 2e-05,
+      "warmup_ratio": 0.1,
+      "max_length": 128,
+      "max_grad_norm": 1.0
+    }
+  },
+  "results": [
+    {
+      "subtask": "A",
+      "method": "random",
+      "split": "dev",
+      "accuracy": 0.55,
+      "n_eval": 20,
+      "prediction_counts": {
+        "A": 15,
+        "B": 5
+      },
+      "eval_seconds": 1.1916039511561394e-05
+    },
+    {
+      "subtask": "B",
+      "method": "random",
+      "split": "dev",
+      "accuracy": 0.65,
+      "n_eval": 20,
+      "prediction_counts": {
+        "A": 11,
+        "B": 2,
+        "C": 7
+      },
+      "eval_seconds": 8.833012543618679e-06
+    },
+    {
+      "subtask": "A",
+      "method": "zero-shot",
+      "split": "dev",
+      "accuracy": 0.35,
+      "n_eval": 20,
+      "prediction_counts": {
+        "A": 5,
+        "B": 15
+      },
+      "mean_letter_mass": 0.21311543006449937,
+      "eval_seconds": 1.4677620839793235,
+      "shots": 0
+    },
+    {
+      "subtask": "B",
+      "method": "zero-shot",
+      "split": "dev",
+      "accuracy": 0.75,
+      "n_eval": 20,
+      "prediction_counts": {
+        "A": 18,
+        "B": 1,
+        "C": 1
+      },
+      "mean_letter_mass": 0.004445980052696541,
+      "eval_seconds": 1.4792705830186605,
+      "shots": 0
+    },
+    {
+      "subtask": "A",
+      "method": "few-shot",
+      "split": "dev",
+      "accuracy": 0.5,
+      "n_eval": 20,
+      "prediction_counts": {
+        "A": 20,
+        "B": 0
+      },
+      "mean_letter_mass": 0.9999572664499283,
+      "eval_seconds": 4.167834666965064,
+      "shots": 4
+    },
+    {
+      "subtask": "B",
+      "method": "few-shot",
+      "split": "dev",
+      "accuracy": 0.75,
+      "n_eval": 20,
+      "prediction_counts": {
+        "A": 15,
+        "B": 1,
+        "C": 4
+      },
+      "mean_letter_mass": 0.996792533993721,
+      "eval_seconds": 5.163580083986744,
+      "shots": 3
+    },
+    {
+      "subtask": "A",
+      "method": "lora",
+      "split": "dev",
+      "accuracy": 0.4,
+      "n_eval": 20,
+      "prediction_counts": {
+        "A": 18,
+        "B": 2
+      },
+      "mean_letter_mass": 0.05132145956158638,
+      "eval_seconds": 1.1998328340123408,
+      "n_train": 32,
+      "train_seconds": 4.83175808400847,
+      "trainable_params": 1146880,
+      "total_params": 597196800,
+      "lora_layers": 56,
+      "loss_start": 1.0905230045318604,
+      "loss_end": 0.5395194888114929
+    },
+    {
+      "subtask": "B",
+      "method": "lora",
+      "split": "dev",
+      "accuracy": 0.6,
+      "n_eval": 20,
+      "prediction_counts": {
+        "A": 10,
+        "B": 2,
+        "C": 8
+      },
+      "mean_letter_mass": 0.9473381876945496,
+      "eval_seconds": 1.6508691670023836,
+      "n_train": 32,
+      "train_seconds": 7.587203375005629,
+      "trainable_params": 1146880,
+      "total_params": 597196800,
+      "lora_layers": 56,
+      "loss_start": 1.233371615409851,
+      "loss_end": 1.0061891078948975
+    },
+    {
+      "subtask": "A",
+      "method": "roberta-base",
+      "split": "dev",
+      "accuracy": 0.45,
+      "n_eval": 20,
+      "prediction_counts": {
+        "A": 7,
+        "B": 13
+      },
+      "eval_seconds": 0.14405929198255762,
+      "n_train": 32,
+      "train_seconds": 0.9464490830432624,
+      "trainable_params": 124646401,
+      "total_params": 124646401,
+      "loss_start": 0.7051463723182678,
+      "loss_end": 0.7039239406585693
+    },
+    {
+      "subtask": "B",
+      "method": "roberta-base",
+      "split": "dev",
+      "accuracy": 0.2,
+      "n_eval": 20,
+      "prediction_counts": {
+        "A": 5,
+        "B": 10,
+        "C": 5
+      },
+      "eval_seconds": 0.4277877080021426,
+      "n_train": 32,
+      "train_seconds": 1.6847760420059785,
+      "trainable_params": 124646401,
+      "total_params": 124646401,
+      "loss_start": 1.1177877187728882,
+      "loss_end": 1.106081485748291
+    },
+    {
+      "subtask": "A",
+      "method": "distilbert",
+      "split": "dev",
+      "accuracy": 0.45,
+      "n_eval": 20,
+      "prediction_counts": {
+        "A": 11,
+        "B": 9
+      },
+      "eval_seconds": 0.07849775004433468,
+      "n_train": 32,
+      "train_seconds": 0.4334983340231702,
+      "trainable_params": 66954241,
+      "total_params": 66954241,
+      "loss_start": 0.7040613293647766,
+      "loss_end": 0.7036505937576294
+    },
+    {
+      "subtask": "B",
+      "method": "distilbert",
+      "split": "dev",
+      "accuracy": 0.4,
+      "n_eval": 20,
+      "prediction_counts": {
+        "A": 7,
+        "B": 4,
+        "C": 9
+      },
+      "eval_seconds": 0.218059417034965,
+      "n_train": 32,
+      "train_seconds": 0.8341391659923829,
+      "trainable_params": 66954241,
+      "total_params": 66954241,
+      "loss_start": 1.0842819213867188,
+      "loss_end": 1.0997427701950073
+    }
+  ],
+  "total_seconds": 83.97378249996109
+}
